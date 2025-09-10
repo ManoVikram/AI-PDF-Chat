@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package pdfchat;
+
+option go_package = "github.com/ManoVikram/AI-PDF-Chat/backend/go-api/pdfchat";
+
+message UploadPDFRequest {
+    string pdf_name = 1;
+    bytes pdf_content = 2;
+}
+
+message UploadPDFResponse {
+    string status = 1;
+}
+
+message AskQuestionRequest {
+    string question = 1;
+}
+
+message AskQuestionResponse {
+    string answer = 1;
+}
+
+service PDFService {
+    rpc UploadPDF(UploadPDFRequest) returns (UploadPDFResponse);
+    rpc AskQuestion(AskQuestionRequest) returns (AskQuestionResponse);
+}
