@@ -3,10 +3,10 @@ from io import BytesIO
 
 import chromadb
 import grpc
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 import pdfplumber
-from proto import service_pb2_grpc, service_pb2
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from proto import service_pb2, service_pb2_grpc
 
 
 class PDFService(service_pb2_grpc.PDFServiceServicer):
