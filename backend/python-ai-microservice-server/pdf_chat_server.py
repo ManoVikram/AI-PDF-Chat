@@ -6,10 +6,15 @@ import grpc
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 import pdfplumber
-from proto import service_pb2_grpc
+from proto import service_pb2_grpc, service_pb2
 
 
 class PDFService(service_pb2_grpc.PDFServiceServicer):
+    def __init__(self):
+        self.embedding_model = OpenAIEmbeddings()
+        self.chroma_client = chromadb.Client()
+        self.collection = self.chroma_client.get_or_create_collection(name="pdf_collection")
+
     def extract_text_from_pdf(self, pdf_bytes):
         text = ""
         with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
@@ -25,21 +30,22 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
             chunk_overlap=overlap,
             separators=["\n\n", "\n", " ", ""]
         )
+        
         return splitter.split_text(text)
     
     def store_chunks_in_chroma(self, chunks, pdf_name):
-        embedding_model = OpenAIEmbeddings()
-        chroma_client = chromadb.Client()
-        collection = chroma_client.get_or_create_collection(name="pdf_collection")
+        embeddings = self.embedding_model.embed_documents(chunks)
+        ids = [f"{pdf_name}-{i}" for i in range(len(chunks))]
+        metadatas = [{"pdf_name": pdf_name, "chunk_index": i} for i in range(len(chunks))]
 
-        for i, chunk in enumerate(chunks):
-            collection.add(
-                documents=[chunk],
-                embeddings=[embedding_model.embed_query(chunk)],
-                metadatas=[{"pdf_name": pdf_name, "chunk_index": i}],
-                ids=[f"{pdf_name}-{i}"],
-            )
-        return
+        self.collection.add(
+            documents=chunks,
+            embeddings=embeddings,
+            metadatas=metadatas,
+            ids=ids
+        )
+
+        return len(chunks)
     
     def process_pdf(self, pdf_name, pdf_bytes):
         # Step 1 - Extract text directly from PDF bytes
@@ -49,18 +55,33 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
         chunks = self.chunk_text(text)
 
         # Step 3 - Store chunks in ChromaDB
-        self.store_chunks_in_chroma(chunks, pdf_name)
+        chunk_count = self.store_chunks_in_chroma(chunks, pdf_name)
 
-        return f"Stored {len(chunks)} chunks for PDF: {pdf_name}"
+        return f"Stored {chunk_count} chunks for PDF: {pdf_name}"
 
     def UploadPDF(self, request, context):
         print(f"Received PDF: {request.pdf_name}, size: {len(request.pdf_content)} bytes")
+        
         status_message = self.process_pdf(request.pdf_name, request.pdf_content)
-        return service_pb2_grpc.UplaodPDFResponse(status=status_message)
+        
+        return service_pb2.UplaodPDFResponse(status=status_message)
     
     def AskQuestion(self, request, context):
         print(f"Received question: {request.question}")
-        return service_pb2_grpc.AskQuestionResponse(answer="This is a placeholder answer.")
+
+        # Step 1 - Embed the question
+        query_embedding = self.embedding_model.embed_query(request.question)
+
+        # Step 2 - Retrieve relevant chunks from ChromaDB
+        results = self.collection.query(query_embeddings=[query_embedding], n_results=3)
+        top_chunks = results.get("documents", [[]])[0]
+
+        # TODO: [TEMP] - Placeholder for answer generation logic
+        # In a real implementation, you would use a language model to generate an answer based on
+        # the retrieved chunks and the question.
+        answer = " ".join(top_chunks) if top_chunks else "No relevant content found."
+        
+        return service_pb2.AskQuestionResponse(answer=answer)
     
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
