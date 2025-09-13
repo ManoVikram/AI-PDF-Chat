@@ -1,39 +1,56 @@
 package main
 
 import (
-	"context"
 	"log"
+	"os"
 
-	pb "github.com/ManoVikram/AI-PDF-Chat/backend/go-api/pdfchat"
+	"github.com/ManoVikram/AI-PDF-Chat/backend/go-api/routes"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+	// Connect to Python gRPC server
 	connection, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer connection.Close()
-
-	client := pb.NewPDFServiceClient(connection)
-
-	pdfRequest := &pb.UploadPDFRequest{
-		PdfName:    "sample.pdf",
-		PdfContent: []byte("dummy PDF data"),
+	
+	// Step up Gin server
+	server := gin.Default()
+	
+	server.RedirectTrailingSlash = true
+	
+	// Register routes
+	routes.RegisterRoutes(server)
+	
+	// Start the Gin server
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
-	response, err := client.UploadPDF(context.Background(), pdfRequest)
-	if err != nil {
-		log.Fatalf("Error uploading PDF: %v", err)
-	}
+	log.Fatal(server.Run(":" + port))
+	
+	// client := pb.NewPDFServiceClient(connection)
 
-	log.Printf("Upload PDF Response: %s", response.Status)
+	// pdfRequest := &pb.UploadPDFRequest{
+	// 	PdfName:    "sample.pdf",
+	// 	PdfContent: []byte("dummy PDF data"),
+	// }
+	// response, err := client.UploadPDF(context.Background(), pdfRequest)
+	// if err != nil {
+	// 	log.Fatalf("Error uploading PDF: %v", err)
+	// }
 
-	questionRequest := &pb.AskQuestionRequest{Question: "What is this PDF about?"}
-	answer, err := client.AskQuestion(context.Background(), questionRequest)
-	if err != nil {
-		log.Fatalf("Error asking question: %v", err)
-	}
+	// log.Printf("Upload PDF Response: %s", response.Status)
 
-	log.Printf("Answer: %s", answer.Answer)
+	// questionRequest := &pb.AskQuestionRequest{Question: "What is this PDF about?"}
+	// answer, err := client.AskQuestion(context.Background(), questionRequest)
+	// if err != nil {
+	// 	log.Fatalf("Error asking question: %v", err)
+	// }
+
+	// log.Printf("Answer: %s", answer.Answer)
 }

@@ -17,11 +17,13 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
 
     def extract_text_from_pdf(self, pdf_bytes):
         text = ""
+        
         with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
             for page in pdf.pages:
                 pdf_text = page.extract_text()
                 if pdf_text:
                     text += pdf_text + "\n"
+        
         return text
     
     def chunk_text(self, text, chunk_size=1000, overlap=200):
