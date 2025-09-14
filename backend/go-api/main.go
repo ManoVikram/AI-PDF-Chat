@@ -32,25 +32,4 @@ func main() {
 		port = "8080"
 	}
 	log.Fatal(server.Run(":" + port))
-	
-	// client := pb.NewPDFServiceClient(connection)
-
-	// pdfRequest := &pb.UploadPDFRequest{
-	// 	PdfName:    "sample.pdf",
-	// 	PdfContent: []byte("dummy PDF data"),
-	// }
-	// response, err := client.UploadPDF(context.Background(), pdfRequest)
-	// if err != nil {
-	// 	log.Fatalf("Error uploading PDF: %v", err)
-	// }
-
-	// log.Printf("Upload PDF Response: %s", response.Status)
-
-	// questionRequest := &pb.AskQuestionRequest{Question: "What is this PDF about?"}
-	// answer, err := client.AskQuestion(context.Background(), questionRequest)
-	// if err != nil {
-	// 	log.Fatalf("Error asking question: %v", err)
-	// }
-
-	// log.Printf("Answer: %s", answer.Answer)
 }
