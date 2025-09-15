@@ -1,7 +1,9 @@
-from asyncio import futures
+from concurrent import futures
 from io import BytesIO
+import os
 
 import chromadb
+from dotenv import load_dotenv
 import grpc
 import pdfplumber
 from langchain_openai import OpenAIEmbeddings
@@ -66,7 +68,7 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
         
         status_message = self.process_pdf(request.pdf_name, request.pdf_content)
         
-        return service_pb2.UplaodPDFResponse(status=status_message)
+        return service_pb2.UploadPDFResponse(status=status_message)
     
     def AskQuestion(self, request, context):
         print(f"Received question: {request.question}")
@@ -86,6 +88,9 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
         return service_pb2.AskQuestionResponse(answer=answer)
     
 def serve():
+    load_dotenv()
+    assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY is not set in the environment variables."
+    
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     service_pb2_grpc.add_PDFServiceServicer_to_server(PDFService(), server)
     server.add_insecure_port('[::]:50051')
