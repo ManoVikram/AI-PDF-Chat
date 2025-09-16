@@ -6,7 +6,7 @@ import chromadb
 from dotenv import load_dotenv
 import grpc
 import pdfplumber
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from proto import service_pb2, service_pb2_grpc
 
@@ -71,21 +71,30 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
         return service_pb2.UploadPDFResponse(status=status_message)
     
     def AskQuestion(self, request, context):
-        print(f"Received question: {request.question}")
+        question = request.question
+        print(f"Received question: {question}")
 
         # Step 1 - Embed the question
-        query_embedding = self.embedding_model.embed_query(request.question)
+        query_embedding = self.embedding_model.embed_query(question)
 
         # Step 2 - Retrieve relevant chunks from ChromaDB
-        results = self.collection.query(query_embeddings=[query_embedding], n_results=3)
-        top_chunks = results.get("documents", [[]])[0]
+        results = self.collection.query(query_embeddings=[query_embedding], n_results=4)
 
-        # TODO: [TEMP] - Placeholder for answer generation logic
-        # In a real implementation, you would use a language model to generate an answer based on
-        # the retrieved chunks and the question.
-        answer = " ".join(top_chunks) if top_chunks else "No relevant content found."
+        # Step 3 - Gather retrieved chunks
+        top_chunks = results.get("documents", [[]])[0]
+        context_text = "\n\n".join(top_chunks)
+
+        # Step 4 - Ask LLM for a concise answer
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        prompt = (
+            "You are a helpful assistant who uses only the provided context to answer the question.\n\n"
+            f"Context:\n{context_text}\n\n"
+            f"Question: {question}\n\n"
+            "Answer concisely: and truthfully based on the context."
+        )
+        response = llm.invoke(prompt)
         
-        return service_pb2.AskQuestionResponse(answer=answer)
+        return service_pb2.AskQuestionResponse(answer=response.content)
     
 def serve():
     load_dotenv()
