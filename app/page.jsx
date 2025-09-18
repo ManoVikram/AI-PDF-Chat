@@ -4,7 +4,7 @@ import React from 'react'
 
 const Home = () => {
   return (
-    <main>
+    <main className='flex flex-col h-screen'>
       <Navbar />
 
       <PDFUploadChatSection />
