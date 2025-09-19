@@ -52,6 +52,14 @@ const PDFUploadChatSection = () => {
                 <p>Drop and drop your files here or <span className='font-bold underline cursor-pointer' onClick={openFileDialog}>Choose file</span></p>
 
                 <input type="file" ref={inputFileRef} className='hidden' accept='application/pdf' onChange={handleFilePick} />
+
+                {fileName && (
+                    <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-cyan-100 rounded-lg'>
+                        <p className='text-sm'><span className='font-medium'>{fileName}</span></p>
+
+                        <button className='bg-yellow-100 px-2 py-1 rounded-lg text-sm cursor-pointer' onClick={() => { }}>Upload</button>
+                    </div>
+                )}
             </div>
 
             <div className="flex flex-col flex-1 justify-center items-center w-full rounded-4xl bg-right-pane space-y-3">
