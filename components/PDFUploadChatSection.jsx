@@ -1,5 +1,6 @@
 "use client"
 
+import { uploadFileToRAG } from '@/lib/utils'
 import Image from 'next/image'
 import React, { useRef, useState } from 'react'
 
@@ -44,6 +45,17 @@ const PDFUploadChatSection = () => {
 
     const openFileDialog = () => inputFileRef.current.click()
 
+    const uploadFile = async () => {
+        const file = inputFileRef.current.files[0]
+        if (!file) {
+            alert('No file selected for upload.')
+            return
+        }
+
+        const data = await uploadFileToRAG(file)
+        console.log('File uploaded successfully:', data)
+    }
+
     return (
         <section className="flex flex-row size-full space-x-6 pt-4">
             <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
@@ -57,7 +69,7 @@ const PDFUploadChatSection = () => {
                     <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-cyan-100 rounded-lg'>
                         <p className='text-sm'><span className='font-medium'>{fileName}</span></p>
 
-                        <button className='bg-yellow-100 px-2 py-1 rounded-lg text-sm cursor-pointer' onClick={() => { }}>Upload</button>
+                        <button className='bg-yellow-100 px-2 py-1 rounded-lg text-sm cursor-pointer' onClick={uploadFile}>Upload</button>
                     </div>
                 )}
             </div>
