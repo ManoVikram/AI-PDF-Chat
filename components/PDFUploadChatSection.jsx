@@ -63,7 +63,9 @@ const PDFUploadChatSection = () => {
         console.log('File uploaded successfully:', data)
     }
 
-    const sendMessage = async () => { }
+    const sendMessage = async () => {
+        if (!input.trim()) return
+    }
 
     const sendMessageOnEnterKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -92,9 +94,9 @@ const PDFUploadChatSection = () => {
 
             <div className="flex flex-col flex-1 justify-center items-center w-full rounded-4xl px-5 bg-right-pane space-y-3">
                 <div className="relative w-full">
-                    <input className='bg-white border-0 outline-none focus:shadow-md w-full py-2 px-4 rounded-full' />
+                    <input type='text' value={input} className='bg-white border-0 outline-none focus:shadow-md w-full py-2 px-4 rounded-full' onChange={(e) => setInput(e.target.value)} />
 
-                    <Image src="search_icon.svg" alt='search-icon' width={30} height={30} className='absolute top-1 right-3' />
+                    <Image src="search_icon.svg" alt='search-icon' width={30} height={30} className='absolute top-1 right-3' onClick={sendMessage} />
                 </div>
             </div>
         </section>
