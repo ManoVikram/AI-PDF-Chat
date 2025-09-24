@@ -7,8 +7,15 @@ import React, { useRef, useState } from 'react'
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
     const [isDragging, setIsDragging] = useState(null)
+    const [messages, setMessages] = useState([])
+    const [input, setInput] = useState("")
 
     const inputFileRef = useRef(null)
+    const chatEndRef = useRef(null)
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages])
 
     const handleDragOver = (e) => {
         e.preventDefault()
@@ -56,6 +63,15 @@ const PDFUploadChatSection = () => {
         console.log('File uploaded successfully:', data)
     }
 
+    const sendMessage = async () => { }
+
+    const sendMessageOnEnterKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault()
+            sendMessage()
+        }
+    }
+
     return (
         <section className="flex flex-row size-full space-x-6 pt-4">
             <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
@@ -74,8 +90,12 @@ const PDFUploadChatSection = () => {
                 )}
             </div>
 
-            <div className="flex flex-col flex-1 justify-center items-center w-full rounded-4xl bg-right-pane space-y-3">
+            <div className="flex flex-col flex-1 justify-center items-center w-full rounded-4xl px-5 bg-right-pane space-y-3">
+                <div className="relative w-full">
+                    <input className='bg-white border-0 outline-none focus:shadow-md w-full py-2 px-4 rounded-full' />
 
+                    <Image src="search_icon.svg" alt='search-icon' width={30} height={30} className='absolute top-1 right-3' />
+                </div>
             </div>
         </section>
     )
