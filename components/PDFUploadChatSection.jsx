@@ -2,12 +2,15 @@
 
 import { uploadFileToRAG } from '@/lib/utils'
 import Image from 'next/image'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
     const [isDragging, setIsDragging] = useState(null)
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState([
+        {sender: "user", text: "Hello World!"},
+        {sender: "assistant", text: "Hello World!"},
+    ])
     const [input, setInput] = useState("")
 
     const inputFileRef = useRef(null)
@@ -92,11 +95,21 @@ const PDFUploadChatSection = () => {
                 )}
             </div>
 
-            <div className="flex flex-col flex-1 justify-center items-center w-full rounded-4xl px-5 bg-right-pane space-y-3">
-                <div className="relative w-full">
-                    <input type='text' value={input} className='bg-white border-0 outline-none focus:shadow-md w-full py-2 px-4 rounded-full' onChange={(e) => setInput(e.target.value)} />
+            <div className="relative flex flex-col flex-1 justify-end items-center w-full rounded-4xl px-5 pb-5 bg-right-pane space-y-3 overflow-hidden">
+                <div className=' flex flex-col justify-end size-full'>
+                    {messages.map((msg, index) => (
+                        <div key={index} className={`p-2 rounded-t-xl ${msg.sender == "user" ? "self-end bg-white/80 rounded-bl-xl" : "self-start bg-orange-100 rounded-br-xl"} mb-2 max-w-xs`}>
+                            <p className='text-sm'>Hello World!</p>
+                        </div>
+                    ))}
 
-                    <Image src="search_icon.svg" alt='search-icon' width={30} height={30} className='absolute top-1 right-3' onClick={sendMessage} />
+                    <div ref={chatEndRef} />
+                </div>
+
+                <div className="relative w-full">
+                    <input type='text' value={input} placeholder='Ask a question...' className='bg-white border-0 outline-none focus:shadow-md w-full py-2 px-4 rounded-full' onChange={(e) => setInput(e.target.value)} />
+
+                    <Image src="search_icon.svg" alt='search-icon' width={30} height={30} className='absolute top-1 right-3 cursor-pointer' onClick={sendMessage} />
                 </div>
             </div>
         </section>
