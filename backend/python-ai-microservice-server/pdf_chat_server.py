@@ -93,6 +93,7 @@ class PDFService(service_pb2_grpc.PDFServiceServicer):
             "Answer concisely: and truthfully based on the context."
         )
         response = llm.invoke(prompt)
+        print(response.content)
         
         return service_pb2.AskQuestionResponse(answer=response.content)
     

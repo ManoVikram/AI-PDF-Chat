@@ -1,16 +1,13 @@
 "use client"
 
-import { uploadFileToRAG } from '@/lib/utils'
+import { sendMessageToRAG, uploadFileToRAG } from '@/lib/utils'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
     const [isDragging, setIsDragging] = useState(null)
-    const [messages, setMessages] = useState([
-        { sender: "user", text: "Hello World!" },
-        { sender: "assistant", text: "Hello World!" },
-    ])
+    const [messages, setMessages] = useState([])
     const [input, setInput] = useState("")
 
     const inputFileRef = useRef(null)
@@ -70,12 +67,11 @@ const PDFUploadChatSection = () => {
         if (!input.trim()) return
 
         setMessages(prevMessages => [...prevMessages, { sender: "user", text: input }])
-        setInput("")
 
-        // Simulate assistant response
-        setTimeout(() => {
-            setMessages(prevMessages => [...prevMessages, { sender: "assistant", text: "This is a simulated response." }])
-        }, 1000)
+        setInput("")
+        
+        var answer = await sendMessageToRAG(input)
+        setMessages(prevMessages => [...prevMessages, { sender: "assistant", text: answer.answer }])
     }
 
     const sendMessageOnEnterKeyDown = (e) => {
