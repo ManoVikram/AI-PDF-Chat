@@ -1,20 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
 @import "tailwindcss";
 
 :root {
-  --background: #FFF5E4;
+  --background: #ffffff;
   --foreground: #171717;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-left-pane: #FFE3E1;
-  --color-right-pane: #FFD1D1;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-open-sans: 'Open Sans', sans-serif;
+  --color-left-pane: #e7fef1;
+  --color-right-pane: #00200f;
 }
 
 @media (prefers-color-scheme: light) {
@@ -27,7 +22,6 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-open-sans);
 }
 
 main {
