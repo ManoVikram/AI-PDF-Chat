@@ -83,7 +83,7 @@ const PDFUploadChatSection = () => {
 
     return (
         <section className="flex flex-row flex-1 overflow-hidden size-full space-x-6 pt-2">
-            <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+            <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 px-5 pb-5 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
                 <Image src="PDFFileIcon.svg" alt='pdf-icon' height={40} width={40} />
 
                 <p>Drop and drop your files here or <span className='font-bold underline cursor-pointer' onClick={openFileDialog}>Choose file</span></p>
