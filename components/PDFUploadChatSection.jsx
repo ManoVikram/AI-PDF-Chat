@@ -1,12 +1,14 @@
 "use client"
 
-import { sendMessageToRAG, uploadFileToRAG } from '@/lib/utils'
+import { sendMessageToRAG, uploadFileToRAG } from '@/lib/actions'
+import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
     const [isDragging, setIsDragging] = useState(null)
+    const [isUploadingFile, setIsUploadingFile] = useState(false)
     const [messages, setMessages] = useState([])
     const [input, setInput] = useState("")
 
@@ -59,8 +61,12 @@ const PDFUploadChatSection = () => {
             return
         }
 
+        setIsUploadingFile(true)
+        
         const data = await uploadFileToRAG(file)
         console.log('File uploaded successfully:', data)
+        
+        setIsUploadingFile(false)
     }
 
     const sendMessage = async () => {
@@ -91,10 +97,10 @@ const PDFUploadChatSection = () => {
                 <input type="file" ref={inputFileRef} className='hidden' accept='application/pdf' onChange={handleFilePick} />
 
                 {fileName && (
-                    <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-cyan-100 rounded-lg'>
+                    <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-white rounded-lg'>
                         <p className='text-sm'><span className='font-medium'>{fileName}</span></p>
 
-                        <button className='bg-yellow-100 px-2 py-1 rounded-lg text-sm cursor-pointer' onClick={uploadFile}>Upload</button>
+                        <button className='bg-right-pane px-2 py-1 rounded-lg cursor-pointer' onClick={uploadFile}>{isUploadingFile ? <Loader2 className='text-white animate-spin' /> : <p className='text-white text-sm'>Upload</p>}</button>
                     </div>
                 )}
             </div>
