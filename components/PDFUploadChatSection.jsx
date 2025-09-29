@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
+    const [droppedFile, setDroppedFile] = useState(null)
     const [allFileNames, setAllFileName] = useState([])
     const [isDragging, setIsDragging] = useState(null)
     const [isUploadingFile, setIsUploadingFile] = useState(false)
@@ -37,6 +38,7 @@ const PDFUploadChatSection = () => {
         const file = e.dataTransfer.files[0]
 
         if (file && file.type === 'application/pdf') {
+            setDroppedFile(file)
             setFileName(file.name)
         } else {
             alert('Please drop a valid PDF file.')
@@ -56,7 +58,7 @@ const PDFUploadChatSection = () => {
     const openFileDialog = () => inputFileRef.current.click()
 
     const uploadFile = async () => {
-        const file = inputFileRef.current.files[0]
+        const file = droppedFile || inputFileRef.current.files[0]
         if (!file) {
             alert('No file selected for upload.')
             return
@@ -111,15 +113,17 @@ const PDFUploadChatSection = () => {
                     )}
                 </div>
 
-                <div className="flex justify-start items-center p-2 w-full space-x-4">
-                    {allFileNames.map((name, index) => (
-                        <div key={index} className="flex flex-col justify-between items-center h-24 w-20 px-2 py-3 rounded-lg bg-white drop-shadow-md space-y-1">
-                            <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={30} width={30} />
+                {allFileNames.length > 0 && (
+                    <div className="flex justify-start items-center p-2 w-full space-x-4 overflow-x-auto">
+                        {allFileNames.map((name, index) => (
+                            <div key={index} className="flex flex-col shrink-0 justify-between items-center h-24 w-20 px-2 py-3 rounded-lg bg-white drop-shadow-md space-y-1">
+                                <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={30} width={30} />
 
-                            <p className='text-xs text-center w-full overflow-hidden overflow-ellipsis'>{name}</p>
-                        </div>
-                    ))}
-                </div>
+                                <p className='text-xs text-center w-full overflow-hidden overflow-ellipsis'>{name}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="relative flex flex-col flex-1 w-full rounded-4xl px-5 pb-5 bg-right-pane space-y-3 overflow-hidden">
