@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 const PDFUploadChatSection = () => {
     const [fileName, setFileName] = useState(null)
+    const [allFileNames, setAllFileName] = useState([])
     const [isDragging, setIsDragging] = useState(null)
     const [isUploadingFile, setIsUploadingFile] = useState(false)
     const [messages, setMessages] = useState([])
@@ -62,11 +63,15 @@ const PDFUploadChatSection = () => {
         }
 
         setIsUploadingFile(true)
-        
+
         const data = await uploadFileToRAG(file)
         console.log('File uploaded successfully:', data)
-        
+
         setIsUploadingFile(false)
+        setAllFileName(prev => [...prev, fileName])
+        setFileName(null)
+
+        inputFileRef.current.value = null
     }
 
     const sendMessage = async () => {
@@ -89,20 +94,32 @@ const PDFUploadChatSection = () => {
 
     return (
         <section className="flex flex-row flex-1 overflow-hidden size-full space-x-6 pt-2">
-            <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 px-5 pb-5 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-                <Image src="PDFFileIcon.svg" alt='pdf-icon' height={40} width={40} />
+            <div className={`flex flex-col flex-1 ${allFileNames.length > 0 && "space-y-4 mb-2"}`}>
+                <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 px-5 pb-5 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+                    <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={40} width={40} />
 
-                <p>Drop and drop your files here or <span className='font-bold underline cursor-pointer' onClick={openFileDialog}>Choose file</span></p>
+                    <p>Drop and drop your files here or <span className='font-bold underline cursor-pointer' onClick={openFileDialog}>Choose file</span></p>
 
-                <input type="file" ref={inputFileRef} className='hidden' accept='application/pdf' onChange={handleFilePick} />
+                    <input type="file" ref={inputFileRef} className='hidden' accept='application/pdf' onChange={handleFilePick} />
 
-                {fileName && (
-                    <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-white rounded-lg'>
-                        <p className='text-sm'><span className='font-medium'>{fileName}</span></p>
+                    {fileName && (
+                        <div className='flex justify-between items-center space-x-8 mt-4 px-3 p-2 bg-white rounded-lg'>
+                            <p className='text-sm'><span className='font-medium'>{fileName}</span></p>
 
-                        <button className='bg-right-pane px-2 py-1 rounded-lg cursor-pointer' onClick={uploadFile}>{isUploadingFile ? <Loader2 className='text-white animate-spin' /> : <p className='text-white text-sm'>Upload</p>}</button>
-                    </div>
-                )}
+                            <button className='bg-right-pane px-2 py-1 rounded-lg cursor-pointer' onClick={uploadFile}>{isUploadingFile ? <Loader2 className='text-white animate-spin' /> : <p className='text-white text-sm'>Upload</p>}</button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex justify-start items-center p-2 w-full space-x-4">
+                    {allFileNames.map((name, index) => (
+                        <div key={index} className="flex flex-col justify-between items-center h-24 w-20 px-2 py-3 rounded-lg bg-white drop-shadow-md space-y-1">
+                            <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={30} width={30} />
+
+                            <p className='text-xs text-center w-full overflow-hidden overflow-ellipsis'>{name}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className="relative flex flex-col flex-1 w-full rounded-4xl px-5 pb-5 bg-right-pane space-y-3 overflow-hidden">
