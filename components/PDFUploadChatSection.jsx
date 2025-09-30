@@ -96,7 +96,7 @@ const PDFUploadChatSection = () => {
 
     return (
         <section className="flex flex-row flex-1 overflow-hidden size-full space-x-6 pt-2">
-            <div className={`flex flex-col flex-1 ${allFileNames.length > 0 && "space-y-4 mb-2"}`}>
+            <div className={`flex flex-col flex-1 min-w-0 ${allFileNames.length > 0 && "space-y-4 mb-2"}`}>
                 <div className={`flex flex-col flex-1 justify-center items-center w-full rounded-4xl space-y-3 px-5 pb-5 transition-colors ${isDragging ? "bg-gray-50" : "bg-left-pane"}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
                     <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={40} width={40} />
 
@@ -114,14 +114,19 @@ const PDFUploadChatSection = () => {
                 </div>
 
                 {allFileNames.length > 0 && (
-                    <div className="flex justify-start items-center p-2 w-full space-x-4 overflow-x-auto">
-                        {allFileNames.map((name, index) => (
-                            <div key={index} className="flex flex-col shrink-0 justify-between items-center h-24 w-20 px-2 py-3 rounded-lg bg-white drop-shadow-md space-y-1">
-                                <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={30} width={30} />
+                    <div className="relative w-full">
+                        <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-50" />
+                        <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" />
 
-                                <p className='text-xs text-center w-full overflow-hidden overflow-ellipsis'>{name}</p>
-                            </div>
-                        ))}
+                        <div className="flex justify-start items-center p-2 w-full space-x-4 overflow-x-auto [&::-webkit-scrollbar]:hidden scroll-smooth [ovescroll-behavior:contain]">
+                            {allFileNames.map((name, index) => (
+                                <div key={index} className="flex flex-col shrink-0 justify-between items-center h-24 w-20 px-2 py-3 rounded-lg bg-white drop-shadow-md space-y-1">
+                                    <Image src="/PDFFileIcon.svg" alt='pdf-icon' height={30} width={30} />
+
+                                    <p className='text-xs text-center w-full overflow-hidden overflow-ellipsis'>{name}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
